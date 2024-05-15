@@ -1,6 +1,7 @@
 // Importa express y otras dependencias
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Crea una instancia de la aplicación express
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/carts', cartsRouter);
 app.use(errorHandler);
 
 // Define el directorio de archivos estáticos
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir));
 

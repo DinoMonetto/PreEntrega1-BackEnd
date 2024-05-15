@@ -10,7 +10,7 @@ import { __dirname } from "../path.js";
 const router = express.Router();
 
 // Importa el middleware productValidator
-import { productValidator } from '../middlewares/productValidator';
+import { productValidator } from '../middlewares/productValidator.js';
 
 // Define la ruta del archivo de productos
 const productsFilePath = path.join(__dirname, '../data/products.json');
