@@ -8,6 +8,34 @@
     "status": true,
     "stock": 50,
     "category": "Comestible",
-    "thumbnails": ["cafe.jpg"]
+    "thumbnails": [
+      "cafe.jpg"
+    ]
+  },
+  {
+    "id": "a1332c2a-0f24-402b-8448-b7c3126b0f7c",
+    "title": "Cafe Nestle",
+    "description": "Cafe Molido",
+    "code": "001",
+    "price": 7500,
+    "status": true,
+    "stock": 50,
+    "category": "Comestible",
+    "thumbnails": [
+      "cafe2.jpg"
+    ]
+  },
+  {
+    "id": "46580d2a-106a-4ab2-b65e-7d051cf32906",
+    "title": "Cafe La virginia",
+    "description": "Cafe Molido",
+    "code": "001",
+    "price": 8500,
+    "status": true,
+    "stock": 50,
+    "category": "Comestible",
+    "thumbnails": [
+      "cafe3.jpg"
+    ]
   }
 ]
