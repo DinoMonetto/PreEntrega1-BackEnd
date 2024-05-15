@@ -1,17 +1,16 @@
 // Importa express y otras dependencias
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+import express from 'express';
+import path from 'path';
 
 // Crea una instancia de la aplicación express
 const app = express();
 
 // Importa los enrutadores de productos y carritos
-const productsRouter = require('./routes/products');
-const cartsRouter = require('./routes/carts');
+import productsRouter from './routes/products.js';
+import cartsRouter from './routes/carts.js';
 
 // Importa el middleware errorHandler
-const { errorHandler } = require('../middlewares/errorhandler');
+import { errorHandler } from './middlewares/errorHandler.js';
 
 // Middleware para analizar el cuerpo de las solicitudes entrantes como JSON
 app.use(express.json());
@@ -23,8 +22,12 @@ app.use('/api/carts', cartsRouter);
 // Middleware para manejar errores
 app.use(errorHandler);
 
+// Define el directorio de archivos estáticos
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir));
+
 // Define el puerto en el que la aplicación escuchará las solicitudes
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 // Inicia el servidor y le hace escuchar en el puerto especificado
 app.listen(PORT, () => {

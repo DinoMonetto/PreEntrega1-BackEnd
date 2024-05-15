@@ -1,7 +1,9 @@
 // Importa las dependencias necesarias
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+import express from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import CartManager from '../managers/cart.manager.js';
+import { __dirname } from "../path.js";
 
 // Crea un enrutador de express
 const router = express.Router();
@@ -9,17 +11,22 @@ const router = express.Router();
 // Define la ruta del archivo de carritos
 const cartsFilePath = path.join(__dirname, '../data/carts.json');
 
+const cartManager = new CartManager(cartsFilePath);
+
 // Funciones auxiliares para obtener y guardar los carritos
-const getCarts = () => {
-    // Lee el archivo de carritos y lo convierte a un objeto JavaScript
-    const data = fs.readFileSync(cartsFilePath, 'utf-8');
-    return JSON.parse(data);
+const getCarts = async () => {
+    try {
+        const data = await fs.readFile(cartsFilePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        return [];
+    }
 };
 
-const saveCarts = (carts) => {
-    // Convierte el objeto JavaScript de carritos a formato JSON y lo escribe en el archivo de carritos
-    fs.writeFileSync(cartsFilePath, JSON.stringify(carts, null, 2));
+const saveCarts = async (carts) => {
+    await fs.writeFile(cartsFilePath, JSON.stringify(carts, null, 2));
 };
+
 
 // Crea un nuevo carrito
 router.post('/', (req, res) => {
@@ -74,4 +81,4 @@ router.post('/:cid/product/:pid', (req, res) => {
 });
 
 // Exporta el enrutador para su uso en otros archivos
-module.exports = router;
+export default router;

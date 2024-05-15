@@ -1,17 +1,21 @@
 // Importa express y otras dependencias
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import express from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import ProductManager from '../managers/product.manager.js';
+import { __dirname } from "../path.js";
 
 // Crea un enrutador de express
 const router = express.Router();
 
 // Importa el middleware productValidator
-const { productValidator } = require('./middlewares/productvalidator');
+import { productValidator } from '../middlewares/productValidator';
 
 // Define la ruta del archivo de productos
 const productsFilePath = path.join(__dirname, '../data/products.json');
+
+const productManager = new ProductManager(productsFilePath);
 
 // Funciones auxiliares para obtener y guardar productos
 const getProducts = () => {
@@ -85,4 +89,4 @@ router.delete('/:pid', (req, res) => {
 });
 
 // Exporta el enrutador para su uso en otros archivos
-module.exports = router;
+export default router;
