@@ -1,13 +1,19 @@
-// src/routes/products.js
+// Importa express y otras dependencias
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+
+// Crea un enrutador de express
 const router = express.Router();
 
+// Importa el middleware productValidator
+const { productValidator } = require('./middlewares/productvalidator');
+
+// Define la ruta del archivo de productos
 const productsFilePath = path.join(__dirname, '../data/products.json');
 
-// Helper functions
+// Funciones auxiliares para obtener y guardar productos
 const getProducts = () => {
     try {
         const data = fs.readFileSync(productsFilePath, 'utf-8');
@@ -21,7 +27,7 @@ const saveProducts = (products) => {
     fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
 };
 
-// List all products with optional limit
+// Lista todos los productos con un límite opcional
 router.get('/', (req, res) => {
     let products = getProducts();
     const limit = req.query.limit ? parseInt(req.query.limit) : products.length;
@@ -29,28 +35,27 @@ router.get('/', (req, res) => {
     res.json(products);
 });
 
-// Get a product by ID
+// Obtiene un producto por su ID
 router.get('/:pid', (req, res) => {
     const products = getProducts();
     const product = products.find(p => p.id === req.params.pid);
     if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
+        return res.status(404).json({ message: 'Producto no encontrado' });
     }
     res.json(product);
 });
 
-// Add a new product
-router.post('/', (req, res) => {
+// Agrega un nuevo producto
+router.post('/', productValidator, (req, res) => {
     const products = getProducts();
     const newProduct = {
         id: uuidv4(),
         ...req.body,
         status: req.body.status !== undefined ? req.body.status : true
     };
-
-    // Check for required fields
+    // Comprueba si se proporcionan todos los campos requeridos
     if (!newProduct.title || !newProduct.description || !newProduct.code || newProduct.price === undefined || newProduct.status === undefined || newProduct.stock === undefined || !newProduct.category) {
-        return res.status(400).json({ message: 'All fields except thumbnails are required' });
+        return res.status(400).json({ message: 'Se necesitan todos los campos excepto thumbnails' });
     }
 
     products.push(newProduct);
@@ -58,12 +63,12 @@ router.post('/', (req, res) => {
     res.status(201).json(newProduct);
 });
 
-// Update a product by ID
+// Actualiza un producto por su ID
 router.put('/:pid', (req, res) => {
     const products = getProducts();
     const index = products.findIndex(p => p.id === req.params.pid);
     if (index === -1) {
-        return res.status(404).json({ message: 'Product not found' });
+        return res.status(404).json({ message: 'Producto no encontrado' });
     }
     const updatedProduct = { ...products[index], ...req.body };
     products[index] = updatedProduct;
@@ -71,7 +76,7 @@ router.put('/:pid', (req, res) => {
     res.json(updatedProduct);
 });
 
-// Delete a product by ID
+// Elimina un producto por su ID
 router.delete('/:pid', (req, res) => {
     let products = getProducts();
     products = products.filter(p => p.id !== req.params.pid);
@@ -79,4 +84,5 @@ router.delete('/:pid', (req, res) => {
     res.status(204).send();
 });
 
+// Exporta el enrutador para su uso en otros archivos
 module.exports = router;
