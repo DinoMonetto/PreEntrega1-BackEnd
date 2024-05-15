@@ -1,0 +1,13 @@
+[
+  {
+    "id": "4a0b1864-cda3-4d6e-b381-46b69d0573a9",
+    "title": "Cafe Dolca",
+    "description": "Cafe Molido",
+    "code": "001",
+    "price": 8000,
+    "status": true,
+    "stock": 50,
+    "category": "Comestible",
+    "thumbnails": ["cafe.jpg"]
+  }
+]
