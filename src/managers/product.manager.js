@@ -1,6 +1,6 @@
-import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
-import { __dirname } from "../path.js";
+import fs from 'fs/promises'; // Importa fs como fs/promises para utilizar los métodos asíncronos
+import { v4 as uuidv4 } from 'uuid';
+import { __dirname } from '../path.js';
 
 export default class ProductManager {
   constructor(path) {
@@ -9,13 +9,11 @@ export default class ProductManager {
 
   async getProducts(limit) {
     try {
-      if (fs.existsSync(this.path)) {
-        const products = await fs.promises.readFile(this.path, "utf8");
-        // if(limit) return JSON.parse(products (cortar el array en limit))
-        return JSON.parse(products);
-      } else return [];
+      const products = await fs.readFile(this.path, 'utf8');
+      return JSON.parse(products);
     } catch (error) {
       console.log(error);
+      return [];
     }
   }
 
@@ -28,7 +26,7 @@ export default class ProductManager {
       };
       const products = await this.getProducts();
       products.push(product);
-      await fs.promises.writeFile(this.path, JSON.stringify(products));
+      await fs.writeFile(this.path, JSON.stringify(products));
       return product;
     } catch (error) {
       console.log(error);
@@ -53,8 +51,8 @@ export default class ProductManager {
       if (!productExist) return null;
       productExist = { ...productExist, ...obj };
       const newArray = products.filter((u) => u.id !== id);
-      newArray.push(productExist)
-      await fs.promises.writeFile(this.path, JSON.stringify(newArray));
+      newArray.push(productExist);
+      await fs.writeFile(this.path, JSON.stringify(newArray));
       return productExist;
     } catch (error) {
       console.log(error);
@@ -67,16 +65,16 @@ export default class ProductManager {
       const productExist = await this.getProductById(id);
       if (productExist) {
         const newArray = products.filter((u) => u.id !== id);
-        await fs.promises.writeFile(this.path, JSON.stringify(newArray));
-        return productExist
-      } 
-    } else return null
+        await fs.writeFile(this.path, JSON.stringify(newArray));
+        return productExist;
+      }
+    } else return null;
   }
 
   async deleteFile() {
     try {
-      await fs.promises.unlink(this.path);
-      console.log("archivo eliminado");
+      await fs.unlink(this.path);
+      console.log('archivo eliminado');
     } catch (error) {
       console.log(error);
     }

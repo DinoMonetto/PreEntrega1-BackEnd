@@ -1,6 +1,6 @@
-// Importa express y otras dependencias
+// Importa las dependencias necesarias
 import express from 'express';
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import ProductManager from '../managers/product.manager.js';
@@ -13,7 +13,8 @@ const router = express.Router();
 import { productValidator } from '../middlewares/productValidator.js';
 
 // Define la ruta del archivo de productos
-const productsFilePath = path.join(__dirname, '../data/products.json');
+const productsFilePath = path.join(__dirname, 'data/products.json');
+console.log('Ruta de archivo de productos:', productsFilePath);
 
 const productManager = new ProductManager(productsFilePath);
 

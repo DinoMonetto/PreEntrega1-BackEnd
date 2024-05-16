@@ -4,9 +4,9 @@
     "title": "Cafe Dolca",
     "description": "Cafe Molido",
     "code": "001",
-    "price": 8000,
+    "price": 8550,
     "status": true,
-    "stock": 50,
+    "stock": 45,
     "category": "Comestible",
     "thumbnails": [
       "cafe.jpg"
@@ -36,6 +36,19 @@
     "category": "Comestible",
     "thumbnails": [
       "cafe3.jpg"
+    ]
+  },
+  {
+    "id": "c301a586-e0d0-4c29-8b1f-cc5ccee5bcee",
+    "title": "Cafe Dolca suave",
+    "description": "Cafe Molido",
+    "code": "003",
+    "price": 8500,
+    "status": true,
+    "stock": 30,
+    "category": "Comestible",
+    "thumbnails": [
+      "cafesuave.jpg"
     ]
   }
 ]

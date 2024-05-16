@@ -1,0 +1,16 @@
+PreEntrega1-BackEnd/
+├── node_modules/
+├── src/
+│   ├── routes/
+│   │   ├── carts.js
+│   │   └── products.js
+│   ├── middlewares/
+│   │   ├── errorHandler.js
+│   │   └── productValidator.js
+│   ├── data/
+│   │   ├── carts.json
+│   │   └── products.json
+│   └── app.js
+│   └── path.js
+├── package.json
+└── README.md
