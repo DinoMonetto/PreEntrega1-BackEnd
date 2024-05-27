@@ -50,5 +50,16 @@
     "thumbnails": [
       "cafesuave.jpg"
     ]
+  },
+  {
+    "id": "c50af3ad-d81c-4caa-a6b1-764d9a6326e5",
+    "title": "Nuevo Producto",
+    "description": "Descripción del nuevo producto",
+    "code": "NP001",
+    "price": 1999,
+    "status": true,
+    "stock": 10,
+    "category": "Electrónica",
+    "thumbnails": []
   }
 ]

@@ -7,13 +7,21 @@ export default class ProductManager {
     this.path = path;
   }
 
-  async getProducts(limit) {
+  async getProducts() {
     try {
       const products = await fs.readFile(this.path, 'utf8');
       return JSON.parse(products);
     } catch (error) {
       console.log(error);
       return [];
+    }
+  }
+
+  async saveProducts(products) {
+    try {
+      await fs.writeFile(this.path, JSON.stringify(products, null, 2));
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -26,7 +34,7 @@ export default class ProductManager {
       };
       const products = await this.getProducts();
       products.push(product);
-      await fs.writeFile(this.path, JSON.stringify(products));
+      await this.saveProducts(products);
       return product;
     } catch (error) {
       console.log(error);
@@ -52,7 +60,7 @@ export default class ProductManager {
       productExist = { ...productExist, ...obj };
       const newArray = products.filter((u) => u.id !== id);
       newArray.push(productExist);
-      await fs.writeFile(this.path, JSON.stringify(newArray));
+      await this.saveProducts(newArray);
       return productExist;
     } catch (error) {
       console.log(error);
@@ -65,7 +73,7 @@ export default class ProductManager {
       const productExist = await this.getProductById(id);
       if (productExist) {
         const newArray = products.filter((u) => u.id !== id);
-        await fs.writeFile(this.path, JSON.stringify(newArray));
+        await this.saveProducts(newArray);
         return productExist;
       }
     } else return null;

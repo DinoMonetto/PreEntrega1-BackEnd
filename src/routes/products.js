@@ -1,6 +1,6 @@
 // Importa las dependencias necesarias
 import express from 'express';
-import fs from 'fs';
+import fs from 'fs/promises'; // Cambiado a fs/promises para consistencia
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import ProductManager from '../managers/product.manager.js';
@@ -18,75 +18,108 @@ console.log('Ruta de archivo de productos:', productsFilePath);
 
 const productManager = new ProductManager(productsFilePath);
 
-// Funciones auxiliares para obtener y guardar productos
-const getProducts = () => {
-    try {
-        const data = fs.readFileSync(productsFilePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-};
-
-const saveProducts = (products) => {
-    fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
-};
-
 // Lista todos los productos con un límite opcional
-router.get('/', (req, res) => {
-    let products = getProducts();
-    const limit = req.query.limit ? parseInt(req.query.limit) : products.length;
-    products = products.slice(0, limit);
-    res.json(products);
+router.get('/', async (req, res) => {
+    try {
+        let products = await productManager.getProducts();
+        const limit = req.query.limit ? parseInt(req.query.limit) : products.length;
+        products = products.slice(0, limit);
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los productos' });
+    }
 });
 
 // Obtiene un producto por su ID
-router.get('/:pid', (req, res) => {
-    const products = getProducts();
-    const product = products.find(p => p.id === req.params.pid);
-    if (!product) {
-        return res.status(404).json({ message: 'Producto no encontrado' });
+router.get('/:pid', async (req, res) => {
+    try {
+        const product = await productManager.getProductById(req.params.pid);
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+        res.json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el producto' });
     }
-    res.json(product);
 });
 
 // Agrega un nuevo producto
-router.post('/', productValidator, (req, res) => {
-    const products = getProducts();
-    const newProduct = {
-        id: uuidv4(),
-        ...req.body,
-        status: req.body.status !== undefined ? req.body.status : true
-    };
-    // Comprueba si se proporcionan todos los campos requeridos
-    if (!newProduct.title || !newProduct.description || !newProduct.code || newProduct.price === undefined || newProduct.status === undefined || newProduct.stock === undefined || !newProduct.category) {
-        return res.status(400).json({ message: 'Se necesitan todos los campos excepto thumbnails' });
-    }
+router.post('/', productValidator, async (req, res) => {
+    try {
+        const { title, description, code, price, status = true, stock, category, thumbnails = [] } = req.body;
 
-    products.push(newProduct);
-    saveProducts(products);
-    res.status(201).json(newProduct);
+        if (!title || !description || !code || price === undefined || stock === undefined || !category) {
+            return res.status(400).json({ message: 'Se necesitan todos los campos excepto thumbnails' });
+        }
+
+        const newProduct = {
+            id: uuidv4(),
+            title,
+            description,
+            code,
+            price,
+            status,
+            stock,
+            category,
+            thumbnails
+        };
+
+        const products = await productManager.getProducts();
+        products.push(newProduct);
+        await productManager.saveProducts(products);
+        res.status(201).json(newProduct);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al crear el producto' });
+    }
 });
 
 // Actualiza un producto por su ID
-router.put('/:pid', (req, res) => {
-    const products = getProducts();
-    const index = products.findIndex(p => p.id === req.params.pid);
-    if (index === -1) {
-        return res.status(404).json({ message: 'Producto no encontrado' });
+router.put('/:pid', async (req, res) => {
+    try {
+        const { title, description, code, price, status, stock, category, thumbnails } = req.body;
+        const product = await productManager.getProductById(req.params.pid);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        const updatedProduct = {
+            ...product,
+            ...(title !== undefined && { title }),
+            ...(description !== undefined && { description }),
+            ...(code !== undefined && { code }),
+            ...(price !== undefined && { price }),
+            ...(status !== undefined && { status }),
+            ...(stock !== undefined && { stock }),
+            ...(category !== undefined && { category }),
+            ...(thumbnails !== undefined && { thumbnails })
+        };
+
+        const products = await productManager.getProducts();
+        const index = products.findIndex(p => p.id === req.params.pid);
+        products[index] = updatedProduct;
+        await productManager.saveProducts(products);
+        res.json(updatedProduct);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el producto' });
     }
-    const updatedProduct = { ...products[index], ...req.body };
-    products[index] = updatedProduct;
-    saveProducts(products);
-    res.json(updatedProduct);
 });
 
 // Elimina un producto por su ID
-router.delete('/:pid', (req, res) => {
-    let products = getProducts();
-    products = products.filter(p => p.id !== req.params.pid);
-    saveProducts(products);
-    res.status(204).send();
+router.delete('/:pid', async (req, res) => {
+    try {
+        const products = await productManager.getProducts();
+        const filteredProducts = products.filter(p => p.id !== req.params.pid);
+
+        if (products.length === filteredProducts.length) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        await productManager.saveProducts(filteredProducts);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar el producto' });
+    }
 });
 
 // Exporta el enrutador para su uso en otros archivos
